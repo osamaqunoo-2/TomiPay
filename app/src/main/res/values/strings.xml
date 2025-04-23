@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">TomiPay</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="phone_number">Phone number</string>
+    <string name="sign_up">Sign up</string>
+    <string name="send_code">Send code</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="Dontalready_have_account">You do not have an account?</string>
+    <string name="login">Login</string>
+    <string name="Hint_of_req">Please fill in all fields.</string>
+    <string name="Back">← Back</string>
+    <string name="OTP_Verification">OTP Verification</string>
+    <string name="Enter_digit_code">Enter 6-digit code</string>
+    <string name="Verify">Verify</string>
+    <string name="Resend_code">Resend code</string>
+    <string name="resend_in_seconds">Resend available in %1$d seconds</string>
+    <string name="please_enter_code">Please enter the verification code</string>
+
+
+</resources>
