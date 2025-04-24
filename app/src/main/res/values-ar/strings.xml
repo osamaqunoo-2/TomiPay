@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">TomiPay</string>
+    <string name="title_activity_splash_screen">شاشة البداية</string>
+
+    <string name="first_name">الاسم الأول</string>
+    <string name="last_name">اسم العائلة</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="send_code">إرسال الرمز</string>
+    <string name="already_have_account">هل لديك حساب بالفعل؟</string>
+    <string name="Dontalready_have_account">ليس لديك حساب؟</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="Hint_of_req">يرجى تعبئة جميع الحقول.</string>
+    <string name="Back">← رجوع</string>
+    <string name="OTP_Verification">التحقق عبر OTP</string>
+    <string name="Enter_digit_code">أدخل رمزًا مكونًا من 6 أرقام</string>
+    <string name="Verify">تحقق</string>
+    <string name="Resend_code">إعادة إرسال الرمز</string>
+    <string name="resend_in_seconds">يمكنك إعادة الإرسال خلال %1$d ثانية</string>
+    <string name="please_enter_code">يرجى إدخال رمز التحقق</string>
+
+    <string name="reset_password_title">هل تريد إعادة تعيين كلمة المرور؟</string>
+    <string name="cancel_button">إلغاء</string>
+    <string name="send_button">إرسال</string>
+    <string name="open_reset_sheet">نسيت كلمة المرور؟</string>
+
+    <string name="password">كلمة المرور</string>
+    <string name="confirm_password">تأكيد كلمة المرور</string>
+    <string name="save_button">حفظ</string>
+    <string name="Set_new_password">تعيين كلمة مرور جديدة</string>
+
+
+
+
+    <string name="welcome_user">مرحبًا بك %1$s</string>
+    <string name="home_screen_message">أنت الآن في الواجهة الرئيسية</string>
+
+    <string name="default_error_message">حدث خطأ ما. رمز الخطأ: %1$d</string>
+    <string name="otp_send_success">تم إرسال رمز التحقق بنجاح!</string>
+    <string name="passwords_do_not_match">كلمتا المرور غير متطابقتين</string>
+    <string name="logout_ar">تسجيل خروج</string>
+
+</resources>

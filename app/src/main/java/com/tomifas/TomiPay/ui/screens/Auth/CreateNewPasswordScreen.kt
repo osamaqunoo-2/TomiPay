@@ -1,8 +1,6 @@
 package com.tomifas.TomiPay.ui.screens.Auth
 
 import android.widget.Toast
-import android.util.Log
-
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -49,24 +47,20 @@ import com.tomifas.TomiPay.viewmodel.AuthViewModel
 import org.json.JSONObject
 
 @Composable
-fun SignUpScreen(navController: NavHostController) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
+fun CreateNewPasswordScreen( phone: String,
+                             otp: String,navController: NavHostController) {
+    var password by remember { mutableStateOf("") }
+    var cpassword by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
-    val viewModel: AuthViewModel = viewModel()
-    val loading by viewModel.loading.collectAsState()
-    val registerResponse by viewModel.registerResponse.collectAsState()
-
     val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel()
+    val resetResponse by viewModel.resetPasswordResponse.collectAsState()
+
+    val loading by viewModel.loading.collectAsState()
 
 
-    val pickerState = rememberKomposeCountryCodePickerState(
-        showCountryCode = true,
-        showCountryFlag = true,
-        defaultCountryCode = "PS"
-    )
+
 
     Column(
         modifier = Modifier
@@ -109,17 +103,17 @@ fun SignUpScreen(navController: NavHostController) {
                 }
         )
 
-        Text("Sign Up", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.Set_new_password), fontSize = 23.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text(stringResource(id = R.string.first_name)) },
+            value = password,
+            onValueChange = { password = it },
+            label = { Text(stringResource(id = R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -134,12 +128,12 @@ fun SignUpScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text(stringResource(id = R.string.last_name)) },
+            value = cpassword,
+            onValueChange = { cpassword = it },
+            label = { Text(stringResource(id = R.string.confirm_password)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -151,40 +145,19 @@ fun SignUpScreen(navController: NavHostController) {
             )
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Box(modifier = Modifier.fillMaxWidth()) {
-            if (phoneNumber.isEmpty()) {
-                Text(
-                    text = stringResource(id = R.string.phone_number),
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 16.dp, top = 14.dp)
-                )
-            }
-
-            KomposeCountryCodePicker(
-                state = pickerState,
-                text = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                modifier = Modifier.fillMaxWidth(),
-
-            )
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                showError = firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank()
+                showError = password.isBlank() || cpassword.isBlank()
                 if (!showError) {
                     // Action to send code or navigate
-
-
-                    viewModel.registerUser(
-                        firstName = firstName.trim(),
-                        lastName = lastName.trim(),
-                        phone = phoneNumber.trim()
-                    )
+                    if (password != cpassword) {
+                        Toast.makeText(context, context.getString(R.string.passwords_do_not_match), Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.resetPassword(phone.trim(), otp.trim(), password.trim())
+                    }
                 }
             },
             shape = RoundedCornerShape(12.dp),
@@ -194,28 +167,22 @@ fun SignUpScreen(navController: NavHostController) {
             if (loading) {
                 CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
             } else {
-                Text(stringResource(id = R.string.send_code), color = Color.White)
+                Text(stringResource(id = R.string.save_button), color = Color.White)
             }
+
         }
-        registerResponse?.let { response ->
+
+        resetResponse?.let { response ->
             LaunchedEffect(response) {
+
+
                 when (response.code()) {
                     200 -> {
-//                        val tag = "VERIFY_OTP_RESPONSE"
-//                        Log.d(tag, "Raw response: $response")
-//                        Log.d(tag, "Phone: ${phoneNumber.trim()}")
-//                        Log.d(tag, "Code: ${response.code()}")
-//                        Log.d(tag, "Body: ${response.body()}")
-//                        Log.d(tag, "Error: ${response.errorBody()?.string()}")
-
-
                         val msg = response.body()?.message ?: "Success"
-                        navController.navigate(
-                            Screen.OtpVerificationScreen.createRoute(
-                                phone = phoneNumber.trim(),
-                                source = "register"
-                            )
-                        )
+
+
+                        navController.navigate(Screen.MainScreen.route)
+
                     }
 
                     else -> {
@@ -236,25 +203,11 @@ fun SignUpScreen(navController: NavHostController) {
                 }
             }
         }
-//
-//        registerResponse?.let { response ->
-//            if (response.isSuccessful) {
-//                val msg = response.body()?.message ?: "Success"
-//                LaunchedEffect(Unit) {
-//                    // انتقل إلى شاشة OTP
-////                    navController.navigate(Screen.OtpVerificationScreen.route)
-////                    navController.navigate(
-////                        Screen.OtpVerificationScreen.createRoute(
-////                            phone = phoneNumber.trim(),
-////                            source = "register"
-////                        )
-////                    )
-//                }
-//            } else {
-//                Toast.makeText(context, stringResource(id = R.string.Registration_failed), Toast.LENGTH_SHORT).show()
-//
-//            }
-//        }
+
+
+
+
+
         if (showError) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -266,32 +219,16 @@ fun SignUpScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.already_have_account),
-                color = hintText,
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = stringResource(id = R.string.login),
-                color = PrimaryColor,
-                modifier = Modifier.clickable {
-                    navController.navigate(Screen.Login.route)
-                }
-            )
-        }
+
+
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun SignUpScreenPreview() {
+fun CreateNewPasswordScreenPrivew() {
     TomiPayTheme {
         val navController = rememberNavController()
-        SignUpScreen(navController)
+        CreateNewPasswordScreen("","",navController)
     }
 }

@@ -114,7 +114,7 @@ fun WelcomeScreen(navController: NavController) {
 
 
         Button(
-            onClick = { navController.navigate(Screen.OtpVerificationScreen.route) },
+            onClick = { navController.navigate(Screen.Login.route) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = PrimaryColor,
                 contentColor = Color.White

@@ -1,5 +1,7 @@
 package com.tomifas.TomiPay.ui.screens.SplashAndWelcome.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -14,14 +16,18 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.Text
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.tomifas.TomiPay.R
 import com.tomifas.TomiPay.navigation.Screen
 import com.tomifas.TomiPay.ui.theme.TomiPayTheme
+import com.tomifas.TomiPay.utils.SecureStorageUtils
 
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 fun AppSplashScreen(navController: NavHostController) {
     val scale = remember { Animatable(0.5f) }
+    val context = LocalContext.current
 
     // Animation and navigation effect
     LaunchedEffect(Unit) {
@@ -33,9 +39,22 @@ fun AppSplashScreen(navController: NavHostController) {
             )
         )
         delay(2000) // Wait 2 more seconds
-        navController.navigate(Screen.Welcome.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
+
+        val token = SecureStorageUtils.getToken(context)
+        if (!token.isNullOrBlank()) {
+
+            navController.navigate(Screen.MainScreen.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
+            }
+        } else {
+
+            navController.navigate(Screen.Welcome.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
+            }
+
         }
+
+
     }
 
     Box(
@@ -54,6 +73,7 @@ fun AppSplashScreen(navController: NavHostController) {
         )
     }
 }
+
 @Composable
 fun SplashContent(scale: Float = 1f) {
     Box(
@@ -71,6 +91,7 @@ fun SplashContent(scale: Float = 1f) {
         )
     }
 }
+
 @Preview
 @Composable
 fun SplashContentPreview() {

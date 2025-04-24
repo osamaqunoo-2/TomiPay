@@ -19,5 +19,23 @@
     <string name="resend_in_seconds">Resend available in %1$d seconds</string>
     <string name="please_enter_code">Please enter the verification code</string>
 
+    <string name="reset_password_title">Do you want to reset your password?</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="send_button">Send</string>
+    <string name="open_reset_sheet">Forgot Password</string>
 
+
+
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="save_button">Save</string>
+    <string name="Set_new_password">Set new password</string>
+
+    <string name="welcome_user">Welcome, %1$s</string>
+    <string name="home_screen_message">You are now on the home screen</string>
+
+    <string name="default_error_message">Something went wrong. Error code: %1$d</string>
+    <string name="otp_send_success">OTP sent successfully!</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="logout">Logout</string>
 </resources>
