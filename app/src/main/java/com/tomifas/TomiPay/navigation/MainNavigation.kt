@@ -14,6 +14,7 @@ import com.tomifas.TomiPay.ui.screens.Auth.SignUpScreen
 import com.tomifas.TomiPay.ui.screens.Auth.CreateNewPasswordScreen
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.tomifas.TomiPay.ui.screens.Main.BiometricAuthScreen
 import com.tomifas.TomiPay.ui.screens.Main.MainScreen
 
 sealed class Screen(val route: String) {
@@ -22,6 +23,7 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object SignUp : Screen("signup")
     object MainScreen : Screen("MainScreen")
+    object BiometricAuthScreen : Screen("BiometricAuthScreen")
 //    object OtpVerificationScreen : Screen("OtpVerificationScreen")
 //    object CreateNewPasswordScreen : Screen("CreateNewPasswordScreen")
     object OtpVerificationScreen : Screen("otp_verification/{phone}/{source}") {
@@ -51,12 +53,18 @@ fun MainNavigation(navController: NavHostController) {
         composable(Screen.MainScreen.route) {
             MainScreen(navController)
         }
+        composable(Screen.BiometricAuthScreen.route) {
+            BiometricAuthScreen(navController)
+        }
 //        composable(Screen.OtpVerificationScreen.route) {
 //            OtpVerificationScreen(navController)
 //        }
 //        composable(Screen.CreateNewPasswordScreen.route) {
 //            CreateNewPasswordScreen(navController)
 //        }
+
+
+
         composable(
             route = Screen.OtpVerificationScreen.route,
             arguments = listOf(

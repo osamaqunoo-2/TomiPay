@@ -25,6 +25,18 @@ import com.tomifas.TomiPay.R
 import com.tomifas.TomiPay.navigation.Screen
 import com.tomifas.TomiPay.ui.theme.TomiPayTheme
 import com.tomifas.TomiPay.utils.SecureStorageUtils
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.core.content.ContextCompat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import java.util.concurrent.Executor
+
 
 @RequiresApi(Build.VERSION_CODES.M)
 @Composable
@@ -32,18 +44,36 @@ fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
     val user = SecureStorageUtils.getUser(context)
 
+//    SecureStorageUtils.disableBiometric(context)
 
+    var isBiometricEnabled = SecureStorageUtils.isBiometricEnabled(context) // اضيف فحص البصمة
+    var showBiometricPrompt by remember { mutableStateOf(false) }
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+
+
+
+
+    LaunchedEffect(Unit) {
+
+        if (!isBiometricEnabled) {
+
+
+            showBottomSheet = true
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(R.string.welcome_user, user?.first_name ?: "User"))
-
-
+        SecureStorageUtils.savePhoneNumber(context, user?.phone!!)
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
@@ -64,8 +94,102 @@ fun MainScreen(navController: NavHostController) {
         ) {
             Text(text = stringResource(id = R.string.logout), color = Color.White)
         }
+        Spacer(modifier = Modifier.height(32.dp))
+
+
+
+
+
+
+        Button(
+            onClick = {
+                if (isBiometricEnabled) {
+
+                    SecureStorageUtils.disableBiometric(context)
+                    SecureStorageUtils.clearPhoneNumber(context)
+                    isBiometricEnabled = false
+                    Toast.makeText(context, "Biometric disabled successfully.", Toast.LENGTH_SHORT).show()
+                } else {
+
+                    showBottomSheet = true
+                }
+            },
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        ) {
+            Text(
+                text = if (isBiometricEnabled) "Disable Biometric" else "Enable Biometric",
+                color = Color.White
+            )
+        }
     }
+
+
+    if (showBottomSheet) {
+        BiometricPromptBottomSheet(
+            navController = navController,
+            onDismiss = {
+                showBottomSheet = false
+
+                isBiometricEnabled = SecureStorageUtils.isBiometricEnabled(context)
+            }
+        )
+
+
+    }
+
+
+//
+//    if (showBottomSheet) {
+//        BiometricPromptBottomSheet(
+//            navController = navController,
+//            onDismiss = {
+//                showBottomSheet = false
+//                showBiometricPrompt = false
+//            }
+//        )
+//    }
+//
+//    if (showBiometricPrompt) {
+//
+//        BiometricPromptBottomSheet(
+//            navController = navController,
+//            onDismiss = { showBiometricPrompt = false }
+//        )
+//    }
 }
+
+@Composable
+fun BiometricPromptBottomSheet(
+    navController: NavHostController,
+    onDismiss: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = R.string.biometric_prompt_title)) },
+        text = { Text(text = stringResource(id = R.string.biometric_prompt_message)) },
+        confirmButton = {
+            Button(onClick = {
+
+                navController.navigate(Screen.BiometricAuthScreen.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+                onDismiss()
+            }) {
+                Text(text = stringResource(id = R.string.biometric_prompt_confirm))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.biometric_prompt_later))
+            }
+        }
+    )
+}
+
 
 @Composable
 fun HomeScreen() {

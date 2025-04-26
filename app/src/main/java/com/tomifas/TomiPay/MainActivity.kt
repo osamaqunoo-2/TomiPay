@@ -1,9 +1,11 @@
 package com.tomifas.TomiPay
 
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.LayoutDirection
@@ -12,8 +14,10 @@ import com.tomifas.TomiPay.navigation.MainNavigation
 import com.tomifas.TomiPay.ui.theme.TomiPayTheme
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.fragment.app.FragmentActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

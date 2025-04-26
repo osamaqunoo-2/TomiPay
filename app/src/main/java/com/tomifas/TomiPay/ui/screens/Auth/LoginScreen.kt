@@ -1,15 +1,20 @@
 package com.tomifas.TomiPay.ui.screens.Auth
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricPrompt
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +40,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -42,6 +49,7 @@ import com.joelkanyi.jcomposecountrycodepicker.component.KomposeCountryCodePicke
 import com.joelkanyi.jcomposecountrycodepicker.component.rememberKomposeCountryCodePickerState
 import com.tomifas.TomiPay.R
 import com.tomifas.TomiPay.navigation.Screen
+import com.tomifas.TomiPay.ui.screens.Main.findActivity
 import com.tomifas.TomiPay.ui.theme.PrimaryColor
 import com.tomifas.TomiPay.ui.theme.TomiPayTheme
 import com.tomifas.TomiPay.ui.theme.hintText
@@ -58,8 +66,24 @@ fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
     val viewModel: AuthViewModel = viewModel()
 
-    val sendOtpResponse by viewModel.sendOtpResponse.collectAsState()
+    val activity = context.findActivity()
+    var showBiometric by remember { mutableStateOf(true) }
 
+
+    val isBiometricEnabled = SecureStorageUtils.isBiometricEnabled(context) // اضيف فحص البصمة
+    var showBiometricPromptstatus by remember { mutableStateOf(false) }
+
+
+
+    LaunchedEffect(Unit) {
+        if (isBiometricEnabled) {
+
+            showBiometricPromptstatus = true
+        }
+    }
+
+
+    val sendOtpResponse by viewModel.sendOtpResponse.collectAsState()
 
 
     val loading by viewModel.loading.collectAsState()
@@ -75,6 +99,7 @@ fun LoginScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -88,29 +113,23 @@ fun LoginScreen(navController: NavHostController) {
                 repeatMode = RepeatMode.Restart
             )
         )
-
-        val shimmerBrush = Brush.linearGradient(
-            colors = listOf(
-                Color.Transparent,
-                Color.White.copy(alpha = 0.6f),
-                Color.Transparent
-            ),
-            start = Offset(translateAnim.value - 200f, 0f),
-            end = Offset(translateAnim.value, 0f)
-        )
+//
+//        val shimmerBrush = Brush.linearGradient(
+//            colors = listOf(
+//                Color.Transparent,
+//                Color.White.copy(alpha = 0.6f),
+//                Color.Transparent
+//            ),
+//            start = Offset(translateAnim.value - 200f, 0f),
+//            end = Offset(translateAnim.value, 0f)
+//        )
 
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "TomiPay Logo",
             modifier = Modifier
                 .size(190.dp)
-                .graphicsLayer(alpha = 0.99f)
-                .drawWithCache {
-                    onDrawWithContent {
-                        drawContent()
-                        drawRect(shimmerBrush, blendMode = BlendMode.SrcOver)
-                    }
-                }
+
         )
 
         Text(stringResource(id = R.string.login), fontSize = 28.sp, fontWeight = FontWeight.Bold)
@@ -125,14 +144,34 @@ fun LoginScreen(navController: NavHostController) {
                     modifier = Modifier.padding(start = 16.dp, top = 14.dp)
                 )
             }
-
-            KomposeCountryCodePicker(
-                state = pickerState,
-                text = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                modifier = Modifier.fillMaxWidth(),
-
+            Surface(
+                color = Color.White, // ✅ خلفية بيضاء
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFFCCCCCC)),// اختياري لو بدك زوايا ناعمة
+                tonalElevation = 0.dp, // بدون ظل إضافي
+                shadowElevation = 0.dp, // بدون ظل
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                KomposeCountryCodePicker(
+                    state = pickerState,
+                    text = phoneNumber,
+                    onValueChange = { phoneNumber = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White,
+                        disabledContainerColor = Color.White,
+                        errorContainerColor = Color.White,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                    )
                 )
+            }
+
         }
 
         var showSheet by remember { mutableStateOf(false) }
@@ -143,43 +182,120 @@ fun LoginScreen(navController: NavHostController) {
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = { showSheet = true }) {
+            TextButton(onClick = {
+
+                showError = phoneNumber.isBlank()
+                if (!showError) {
+                    showSheet = true
+
+
+
+                }
+              }
+            ) {
                 Text(
                     text = stringResource(R.string.open_reset_sheet),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
-            ResetPasswordBottomSheet(phoneNumber,
-                showSheet = showSheet,viewModel,
+            ResetPasswordBottomSheet(
+                phoneNumber,
+                showSheet = showSheet, viewModel,
                 onDismiss = { showSheet = false },
                 onSend = {
 
                     showSheet = false
                 }
             )
+
         }
 
-        Button(
-            onClick = {
-                showError = phoneNumber.isBlank()
-                if (!showError) {
-                    // Action to send code or navigate
-                    viewModel.loginUser(context,phoneNumber.trim())
-
-                }
-            },
-            shape = RoundedCornerShape(12.dp),
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if (loading) {
-                CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
-            } else {
-                Text(stringResource(id = R.string.send_code), color = Color.White)
+
+            Button(
+                onClick = {
+                    showError = phoneNumber.isBlank()
+                    if (!showError) {
+                        SecureStorageUtils.savePhoneNumber(context, phoneNumber)
+                        viewModel.loginUser(context, phoneNumber.trim())
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text(text = stringResource(id = R.string.login), color = Color.White)
+                }
             }
 
+
+            if (showBiometricPromptstatus) {
+                Button(
+                    onClick = {
+//                        startBiometricLogin(context, navController)
+                        if (showBiometric && activity != null) {
+
+
+                            showBiometricPrompt(
+                                activity = activity as FragmentActivity,
+                                onAuthenticated = {
+
+                                    val phoneNumberSaved = SecureStorageUtils.getSavedPhoneNumber(context)
+//                                    Toast.makeText(context, "Success!"+phoneNumberSaved.toString(), Toast.LENGTH_SHORT).show()
+
+
+                                    viewModel.loginUser(context, phoneNumberSaved!!.trim())
+//                                        SecureStorageUtils.enableBiometric(context)
+//                                        navController.popBackStack()
+                                },
+                                onFailed = {
+                                    Toast.makeText(
+                                        context,
+                                        "Fingerprint not recognized",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+//                                        navController.popBackStack()
+                                },
+                                onCancelled = {
+                                    Toast.makeText(
+                                        context,
+                                        "Authentication cancelled",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+//                                        navController.popBackStack()
+                                }
+                            )
+
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .size(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_fingerprint), // غير المسار حسب مكان الأيقونة
+                        contentDescription = "Fingerprint Login",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         }
         loginResponse?.let { response ->
             LaunchedEffect(response) {
@@ -209,7 +325,6 @@ fun LoginScreen(navController: NavHostController) {
                         navController.navigate(Screen.MainScreen.route)
 
                     }
-
 
 
                     else -> {
@@ -348,7 +463,7 @@ fun ResetPasswordBottomSheet(
                             viewModel.sendOtpForLogin(phone.trim())
                         },
 
-                    ) {
+                        ) {
                         Text(stringResource(R.string.send_button))
                     }
 
@@ -361,6 +476,54 @@ fun ResetPasswordBottomSheet(
     }
 }
 
+fun showBiometricPrompt(
+    activity: FragmentActivity, // 🛠️ لازم FragmentActivity
+    onAuthenticated: () -> Unit,
+    onFailed: () -> Unit,
+    onCancelled: () -> Unit
+) {
+    val executor = ContextCompat.getMainExecutor(activity)
+
+
+    val biometricPrompt = BiometricPrompt(
+        activity,
+        executor,
+        object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                Log.d("BiometricAuth", "❗ Authentication Error: $errString (code: $errorCode)")
+                onCancelled()
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                Log.d("BiometricAuth", "✅ Authentication Succeeded!")
+                onAuthenticated()
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                Log.d("BiometricAuth", "❌ Authentication Failed (fingerprint not recognized)")
+                onFailed()
+            }
+        }
+    )
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Biometric Authentication")
+        .setSubtitle("Authenticate using your biometric credential")
+        .setNegativeButtonText("Cancel")
+        .build()
+
+    Log.d("BiometricAuth", "🚀 Showing biometric prompt now...") // ← هنا تطبع قبل عرض البصمة
+
+    biometricPrompt.authenticate(promptInfo)
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

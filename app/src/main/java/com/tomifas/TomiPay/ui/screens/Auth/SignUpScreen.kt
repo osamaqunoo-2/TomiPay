@@ -9,6 +9,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -71,6 +72,7 @@ fun SignUpScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -162,13 +164,35 @@ fun SignUpScreen(navController: NavHostController) {
                 )
             }
 
-            KomposeCountryCodePicker(
-                state = pickerState,
-                text = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                modifier = Modifier.fillMaxWidth(),
+            Surface(
+                color = Color.White,
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFFCCCCCC)),
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                KomposeCountryCodePicker(
+                    state = pickerState,
+                    text = phoneNumber,
+                    onValueChange = { phoneNumber = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White,
+                        disabledContainerColor = Color.White,
+                        errorContainerColor = Color.White,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                    )
+                )
+            }
 
-            )
+
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -177,7 +201,7 @@ fun SignUpScreen(navController: NavHostController) {
             onClick = {
                 showError = firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank()
                 if (!showError) {
-                    // Action to send code or navigate
+
 
 
                     viewModel.registerUser(
@@ -201,12 +225,6 @@ fun SignUpScreen(navController: NavHostController) {
             LaunchedEffect(response) {
                 when (response.code()) {
                     200 -> {
-//                        val tag = "VERIFY_OTP_RESPONSE"
-//                        Log.d(tag, "Raw response: $response")
-//                        Log.d(tag, "Phone: ${phoneNumber.trim()}")
-//                        Log.d(tag, "Code: ${response.code()}")
-//                        Log.d(tag, "Body: ${response.body()}")
-//                        Log.d(tag, "Error: ${response.errorBody()?.string()}")
 
 
                         val msg = response.body()?.message ?: "Success"
@@ -236,25 +254,8 @@ fun SignUpScreen(navController: NavHostController) {
                 }
             }
         }
-//
-//        registerResponse?.let { response ->
-//            if (response.isSuccessful) {
-//                val msg = response.body()?.message ?: "Success"
-//                LaunchedEffect(Unit) {
-//                    // انتقل إلى شاشة OTP
-////                    navController.navigate(Screen.OtpVerificationScreen.route)
-////                    navController.navigate(
-////                        Screen.OtpVerificationScreen.createRoute(
-////                            phone = phoneNumber.trim(),
-////                            source = "register"
-////                        )
-////                    )
-//                }
-//            } else {
-//                Toast.makeText(context, stringResource(id = R.string.Registration_failed), Toast.LENGTH_SHORT).show()
-//
-//            }
-//        }
+
+
         if (showError) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(

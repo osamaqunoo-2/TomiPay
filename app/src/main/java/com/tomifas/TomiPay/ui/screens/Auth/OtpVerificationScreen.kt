@@ -11,6 +11,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,6 +75,7 @@ fun OtpVerificationScreen(phone: String, source: String, navController: NavHostC
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -81,9 +83,10 @@ fun OtpVerificationScreen(phone: String, source: String, navController: NavHostC
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
+
                 stringResource(id = R.string.Back),
                 color = PrimaryColor,
-                modifier = Modifier.clickable { navController.popBackStack() }
+                modifier = Modifier.clickable { navController.navigate(Screen.Login.route) }
             )
         }
 

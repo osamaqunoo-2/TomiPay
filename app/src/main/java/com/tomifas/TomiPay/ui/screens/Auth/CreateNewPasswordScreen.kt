@@ -65,6 +65,7 @@ fun CreateNewPasswordScreen( phone: String,
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

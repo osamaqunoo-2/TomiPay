@@ -11,5 +11,5 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val PrimaryColor = Color(0xFF2D9CDB) // ← لون TomiPay الأزرق
-val lineOutlinColor = Color(0xFFCCC2DC) // ← لون TomiPay الأزرق
+val lineOutlinColor = Color(0xFFCCCCCC) // ← لون TomiPay الأزرق
 val hintText = Color(0xFFA0A3A5) // ← لون TomiPay الأزرق

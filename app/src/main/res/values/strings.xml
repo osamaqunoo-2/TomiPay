@@ -38,4 +38,12 @@
     <string name="otp_send_success">OTP sent successfully!</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="logout">Logout</string>
+
+
+    <string name="biometric_prompt_title">Enable Biometric</string>
+    <string name="biometric_prompt_message">Would you like to enable login using biometric authentication instead of OTP?</string>
+    <string name="biometric_prompt_confirm">Enable</string>
+    <string name="biometric_prompt_later">Later</string>
+    <string name="Disable_Biometric">Disable Biometric</string>
+    <string name="Enable_Biometric">Enable Biometric</string>
 </resources>

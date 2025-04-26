@@ -38,6 +38,13 @@
     <string name="default_error_message">حدث خطأ ما. رمز الخطأ: %1$d</string>
     <string name="otp_send_success">تم إرسال رمز التحقق بنجاح!</string>
     <string name="passwords_do_not_match">كلمتا المرور غير متطابقتين</string>
-    <string name="logout_ar">تسجيل خروج</string>
 
+
+
+    <string name="logout">تسجيل الخروج</string>
+
+    <string name="biometric_prompt_title">تفعيل البصمة</string>
+    <string name="biometric_prompt_message">هل ترغب بتفعيل تسجيل الدخول باستخدام البصمة بدلاً من رمز التحقق (OTP)؟</string>
+    <string name="biometric_prompt_confirm">تفعيل</string>
+    <string name="biometric_prompt_later">لاحقاً</string>
 </resources>

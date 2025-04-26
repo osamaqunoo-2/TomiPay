@@ -45,7 +45,6 @@ object SecureStorageUtils {
     }
 
 
-
     private const val USER_KEY = "user_data"
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -62,10 +61,68 @@ object SecureStorageUtils {
         return Gson().fromJson(json, User::class.java)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun clearUser(context: Context) {
+        val prefs = getPrefs(context)
+        prefs.edit().remove(USER_KEY).apply()
+    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun logout(context: Context) {
-        val prefs = getPrefs(context)
-        prefs.edit().clear().apply()
+//        val prefs = getPrefs(context)
+//        prefs.edit().clear().apply()
+
+
+        clearToken(context)
+        clearUser(context)
+
+
+    }
+
+    private const val BIOMETRIC_ENABLED_KEY = "biometric_enabled"
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun getEncryptedPrefs(context: Context) = EncryptedSharedPreferences.create(
+        PREF_NAME,
+        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun enableBiometric(context: Context) {
+        val prefs = getEncryptedPrefs(context)
+        prefs.edit().putBoolean(BIOMETRIC_ENABLED_KEY, true).apply()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun isBiometricEnabled(context: Context): Boolean {
+        val prefs = getEncryptedPrefs(context)
+        return prefs.getBoolean(BIOMETRIC_ENABLED_KEY, false)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun disableBiometric(context: Context) {
+        val prefs = getEncryptedPrefs(context)
+        prefs.edit().putBoolean("biometric_enabled", false).apply()
+    }
+
+    private const val KEY_PHONE_NUMBER = "saved_phone_number"
+
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun savePhoneNumber(context: Context, phoneNumber: String) {
+        getEncryptedPrefs(context).edit().putString(KEY_PHONE_NUMBER, phoneNumber).apply()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun getSavedPhoneNumber(context: Context): String? {
+        return getEncryptedPrefs(context).getString(KEY_PHONE_NUMBER, null)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun clearPhoneNumber(context: Context) {
+        getEncryptedPrefs(context).edit().remove(KEY_PHONE_NUMBER).apply()
     }
 }
